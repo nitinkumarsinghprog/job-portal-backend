@@ -15,7 +15,7 @@ const getAdminDashboard = AsyncHandler(async (req, res) => {
         );
 
     console.log("========== Get Current User Response ==========");
-    console.lop(JSON.stringify(user, null, 2));
+    console.log(JSON.stringify(user, null, 2));
 
     return res.status(200).json(response);
 });
@@ -69,7 +69,7 @@ const createRecruiter = AsyncHandler(async (req, res) => {
         );
 
     console.log("========== Response of create Recruiter ==========");
-    console.lop(JSON.stringify(user, null, 2));
+    console.log(JSON.stringify(user, null, 2));
 
     // 5. Response
     return res.status(201).json(response);
@@ -77,18 +77,26 @@ const createRecruiter = AsyncHandler(async (req, res) => {
 
 const getAllUsers = AsyncHandler(async (req, res) => {
 
+    const { role } = req.query;
+
+    const filter = {};
+
+    if (role) {
+        filter.role = role.trim().toLowerCase();
+    }
+
     const users = await User
-        .find()
+        .find(filter)
         .select("-password -refreshToken");
 
-    const response =  new ApiResponse(
-            200,
-            users,
-            "Users fetched successfully"
-        );
+    const response = new ApiResponse(
+        200,
+        users,
+        "Users fetched successfully"
+    );
 
-    console.log("========== Response of all user ==========");
-    console.lop(JSON.stringify(user, null, 2));
+    console.log("========== Response of all users ==========");
+    console.log(JSON.stringify(users, null, 2));
 
     return res.status(200).json(response);
 });
