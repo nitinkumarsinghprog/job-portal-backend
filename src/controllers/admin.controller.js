@@ -77,26 +77,67 @@ const createRecruiter = AsyncHandler(async (req, res) => {
 
 const getAllUsers = AsyncHandler(async (req, res) => {
 
-    const { role } = req.query;
+    const { role, search } = req.query;
 
+    // Pagination
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Filter
     const filter = {};
 
+    // Role filter
     if (role) {
         filter.role = role.trim().toLowerCase();
     }
 
+    // Search filter
+    if (search) {
+        filter.$or = [
+            {
+                name: {
+                    $regex: search.trim(),
+                    $options: "i"
+                }
+            },
+            {
+                email: {
+                    $regex: search.trim(),
+                    $options: "i"
+                }
+            }
+        ];
+    }
+
+    // Fetch users
     const users = await User
         .find(filter)
-        .select("-password -refreshToken");
+        .select("-password -refreshToken")
+        .skip(skip)
+        .limit(limit);
+
+    // Total users after filters
+    const totalUsers = await User.countDocuments(filter);
+
+    const totalPages = Math.ceil(totalUsers / limit);
 
     const response = new ApiResponse(
         200,
-        users,
+        {
+            users,
+            pagination: {
+                currentPage: page,
+                limit,
+                totalUsers,
+                totalPages
+            }
+        },
         "Users fetched successfully"
     );
 
     console.log("========== Response of all users ==========");
-    console.log(JSON.stringify(users, null, 2));
+    console.log(JSON.stringify(response, null, 2));
 
     return res.status(200).json(response);
 });
