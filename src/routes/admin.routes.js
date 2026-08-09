@@ -47,4 +47,12 @@ router.patch(
     adminController.updateUser
 );
 
+// Status of user 
+router.patch(
+    "/users/:userId/block",
+    verifyJWT,
+    authorizeRoles("admin"),
+    adminController.toggleUserBlockStatus
+);
+
 module.exports = router;
