@@ -27,9 +27,7 @@ const generateAccessAndRefreshToken = async (userId) => {
 
 const registerUser = AsyncHandler(async (req, res) => {
 
-    const { name, email, password, role } = req.body;
-
-    const userRole = role?.trim() || "candidate";
+    const { name, email, password } = req.body;
 
     // 1. Validate required fields
     if (!name || !email || !password) {
@@ -51,7 +49,7 @@ const registerUser = AsyncHandler(async (req, res) => {
         name,
         email,
         password,
-        role: userRole
+        role: "candidate"
     });
 
     // 4. Fetch user without password
