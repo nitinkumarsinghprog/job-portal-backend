@@ -151,7 +151,7 @@ const logoutUser = AsyncHandler (async (req, res) => {
     );
 
     console.log("========== Logout Response ==========");
-    console.dir(response, { depth: null });
+    console.dir(response);
 
     return res
         .status(200)
@@ -200,7 +200,7 @@ const refreshAccessToken = AsyncHandler (async (req, res) =>{
                 )
 
         console.log("========== Refresh Access Token Response ==========");
-        console.dir(response, { depth: null });
+        console.dir(response);
 
         return res
             .status(200)
@@ -262,7 +262,7 @@ const changeCurrentPassword = AsyncHandler (async (req, res) => {
     )
 
     console.log("========== Change Password Response ==========");
-    console.dir(response, { depth: null });
+    console.dir(response);
 
     // 6. Response
     return res.status(200).json(response);
@@ -274,7 +274,7 @@ const getCurrentUser = AsyncHandler (async (req, res) => {
     const response =  new ApiResponse(200, req.user, "Current user fetched successfully")
 
     console.log("========== Get Current User Response ==========");
-    console.dir(response, { depth: null });
+    console.dir(response);
 
     return res.status(200).json(response);
 });
@@ -298,7 +298,7 @@ const deleteCurrentUser = AsyncHandler(async (req, res) => {
     const response =  new ApiResponse(200, req.user, "User account deleted successfully")
 
     console.log("========== Get Current User Response ==========");
-    console.dir(response, { depth: null });
+    console.dir(response);
 
     return res
         .status(200)
