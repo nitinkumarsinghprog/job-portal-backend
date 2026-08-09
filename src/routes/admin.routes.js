@@ -55,4 +55,12 @@ router.patch(
     adminController.toggleUserBlockStatus
 );
 
+// Delete user 
+router.delete(
+    "/users/:userId",
+    verifyJWT,
+    authorizeRoles("admin"),
+    adminController.deleteUser
+);
+
 module.exports = router;

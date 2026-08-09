@@ -277,6 +277,41 @@ const toggleUserBlockStatus = AsyncHandler(async (req, res) => {
     return res.status(200).json(response);
 });
 
+const deleteUser = AsyncHandler(async (req, res) => {
+
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new ApiError(
+            404,
+            "User not found"
+        );
+    }
+
+    // Admin ko delete nahi karna
+    if (user.role === "admin") {
+        throw new ApiError(
+            403,
+            "Admin user cannot be deleted"
+        );
+    }
+
+    await User.findByIdAndDelete(userId);
+
+    const response = new ApiResponse(
+        200,
+        {},
+        "User deleted successfully"
+    );
+
+    console.log("========== Delete User ==========");
+    console.log(JSON.stringify(response, null, 2));
+
+    return res.status(200).json(response);
+});
+
 module.exports = {
     getAdminDashboard,
     createRecruiter,
@@ -284,4 +319,5 @@ module.exports = {
     getUserById,
     updateUser,
     toggleUserBlockStatus,
+    deleteUser,
 };
