@@ -161,8 +161,154 @@ const logoutUser = AsyncHandler (async (req, res) => {
         .json(response);
 });
 
+const refreshAccessToken = AsyncHandler (async (req, res) =>{
+
+    const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+
+    if(!incomingRefreshToken) {
+        throw new ApiError(401, "Refresh token is missing");
+    };
+
+    try {
+
+        const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+        const user = await User.findById(decodedToken?._id);
+
+        if(!user){
+            throw new ApiError(401, "Invalid Refresh Token");
+        }
+
+        if(incomingRefreshToken !== user?.refreshToken){
+            throw new ApiError(401, "Refresh token is not valid");
+        }
+
+        const options = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        };
+
+        const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshToken(user._id);
+
+         const response = new ApiResponse(
+                    200,
+                    {
+                        accessToken: accessToken,
+                        refreshToken: newRefreshToken
+                    },
+                    "Access token refreshed successfully"
+                )
+
+        console.log("========== Refresh Access Token Response ==========");
+        console.dir(response, { depth: null });
+
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
+            .json( response );
+
+    } catch (error) {
+        throw new ApiError(401, "Invalid or expired refresh token");
+    }
+});
+
+const changeCurrentPassword = AsyncHandler (async (req, res) => {
+
+    const { oldPassword, newPassword } = req.body;
+
+    // 1. Validate input
+    if (!oldPassword || !newPassword) {
+        throw new ApiError(
+            400,
+            "Old password and new password are required"
+        );
+    }
+
+    // 2. Find current user
+    const user = await User.findById(req.user?._id);
+
+    if (!user) {
+        throw new ApiError(
+            404,
+            "User not found"
+        );
+    }
+
+    // 3. Verify old password
+    const isPasswordCorrect =
+        await user.isPasswordCorrect(oldPassword);
+
+    if (!isPasswordCorrect) {
+        throw new ApiError(
+            401,
+            "Old password is incorrect"
+        );
+    }
+
+    // 4. Set new password
+    user.password = newPassword;
+
+    // 5. pre("save") will hash the password
+    await user.save();
+
+    const response = new ApiResponse(
+        200, {}, "Password changed successfully"
+    )
+
+    console.log("========== Change Password Response ==========");
+    console.dir(response, { depth: null });
+
+    // 6. Response
+    return res.status(200).json(response);
+    
+});
+
+const getCurrentUser = AsyncHandler (async (req, res) => {
+
+    const response =  new ApiResponse(200, req.user, "Current user fetched successfully")
+
+    console.log("========== Get Current User Response ==========");
+    console.dir(response, { depth: null });
+
+    return res.status(200).json(response);
+});
+
+const deleteCurrentUser = AsyncHandler(async (req, res) => {
+
+    const user = await User.findByIdAndDelete(req.user._id);
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production"
+            ? "none"
+            : "lax"
+    };
+
+    const response =  new ApiResponse(200, req.user, "User account deleted successfully")
+
+    console.log("========== Get Current User Response ==========");
+    console.dir(response, { depth: null });
+
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(response);
+});
+
 module.exports = {
     registerUser,
     loginUser,
     logoutUser,
+    refreshAccessToken,
+    changeCurrentPassword,
+    getCurrentUser,
+    deleteCurrentUser,
 };
