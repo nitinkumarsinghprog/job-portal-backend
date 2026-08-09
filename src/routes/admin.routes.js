@@ -63,4 +63,12 @@ router.delete(
     adminController.deleteUser
 );
 
+// Statistics 
+router.get(
+    "/statistics",
+    verifyJWT,
+    authorizeRoles("admin"),
+    adminController.getAdminStatistics
+);
+
 module.exports = router;

@@ -312,6 +312,51 @@ const deleteUser = AsyncHandler(async (req, res) => {
     return res.status(200).json(response);
 });
 
+const getAdminStatistics = AsyncHandler(async (req, res) => {
+
+    const totalUsers = await User.countDocuments();
+
+    const totalCandidates = await User.countDocuments({
+        role: "candidate"
+    });
+
+    const totalRecruiters = await User.countDocuments({
+        role: "recruiter"
+    });
+
+    const totalAdmins = await User.countDocuments({
+        role: "admin"
+    });
+
+    const blockedUsers = await User.countDocuments({
+        isBlocked: true
+    });
+
+    const activeUsers = await User.countDocuments({
+        isBlocked: false
+    });
+
+    const statistics = {
+        totalUsers,
+        totalCandidates,
+        totalRecruiters,
+        totalAdmins,
+        blockedUsers,
+        activeUsers
+    };
+
+    const response = new ApiResponse(
+        200,
+        statistics,
+        "Admin statistics fetched successfully"
+    );
+
+    console.log("========== Admin Statistics ==========");
+    console.log(JSON.stringify(response, null, 2));
+
+    return res.status(200).json(response);
+});
+
 module.exports = {
     getAdminDashboard,
     createRecruiter,
@@ -320,4 +365,5 @@ module.exports = {
     updateUser,
     toggleUserBlockStatus,
     deleteUser,
+    getAdminStatistics,
 };
