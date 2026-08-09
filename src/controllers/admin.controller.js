@@ -160,9 +160,82 @@ const getUserById = AsyncHandler(async (req,res) => {
     return res.status(200).json(response);
 });
 
+const updateUser = AsyncHandler(async (req, res) => {
+
+    const { userId } = req.params;
+    const { name, email, role } = req.body;
+
+    // At least one field required
+    if (!name && !email && !role) {
+        throw new ApiError(
+            400,
+            "At least one field is required to update"
+        );
+    }
+
+    // Admin can assign only candidate or recruiter
+    if (
+        role &&
+        !["candidate", "recruiter"].includes(
+            role.trim().toLowerCase()
+        )
+    ) {
+        throw new ApiError(
+            403,
+            "You cannot assign admin role"
+        );
+    }
+
+    const updateData = {};
+
+    if (name) {
+        updateData.name = name.trim();
+    }
+
+    if (email) {
+        updateData.email = email.trim().toLowerCase();
+    }
+
+    if (role) {
+        updateData.role = role.trim().toLowerCase();
+    }
+
+    const updatedUser = await User
+        .findByIdAndUpdate(
+            userId,
+            {
+                $set: updateData
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        )
+        .select("-password -refreshToken");
+
+    if (!updatedUser) {
+        throw new ApiError(
+            404,
+            "User not found"
+        );
+    }
+
+    const response = new ApiResponse(
+        200,
+        updatedUser,
+        "User updated successfully"
+    );
+
+    console.log("========== Response of update user ==========");
+    console.log(JSON.stringify(response, null, 2));
+
+    return res.status(200).json(response);
+});
+
 module.exports = {
     getAdminDashboard,
     createRecruiter,
     getAllUsers,
     getUserById,
+    updateUser,
 };

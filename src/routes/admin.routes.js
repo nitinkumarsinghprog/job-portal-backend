@@ -39,4 +39,12 @@ router.get(
     adminController.getUserById
 );
 
+// Update User by ID
+router.patch(
+    "/users/:userId",
+    verifyJWT,
+    authorizeRoles("admin"),
+    adminController.updateUser
+);
+
 module.exports = router;
