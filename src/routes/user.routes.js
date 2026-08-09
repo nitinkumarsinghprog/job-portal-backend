@@ -14,7 +14,7 @@ router.post("/refresh_token", userController.refreshAccessToken);
 // Secure Routes
 router.post("/logout", verifyJWT, userController.logoutUser);
 router.post("/change_password", verifyJWT, userController.changeCurrentPassword);
-router.get("/me", verifyJWT, userController.getCurrentUser);
-router.delete("/me", verifyJWT, userController.deleteCurrentUser);
+router.get("/get_user", verifyJWT, userController.getCurrentUser);
+router.delete("/delete_user", verifyJWT, userController.deleteCurrentUser);
 
 module.exports = router;

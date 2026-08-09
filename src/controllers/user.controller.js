@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 
 const AsyncHandler = require("../utils/AsyncHandler");
 const ApiError = require("../utils/ApiError");
@@ -210,8 +211,13 @@ const refreshAccessToken = AsyncHandler (async (req, res) =>{
             .json( response );
 
     } catch (error) {
-        throw new ApiError(401, "Invalid or expired refresh token");
-    }
+        console.log("========== REFRESH TOKEN ERROR ==========");
+        console.log(error);
+        throw new ApiError(
+            401,
+            error.message || "Invalid or expired refresh token"
+        );
+        }
 });
 
 const changeCurrentPassword = AsyncHandler (async (req, res) => {
