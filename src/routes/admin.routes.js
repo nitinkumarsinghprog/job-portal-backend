@@ -31,4 +31,44 @@ router.get(
     adminController.getAllUsers
 );
 
+// Get User by ID
+router.get(
+    "/users/:userId",
+    verifyJWT,
+    authorizeRoles("admin"),
+    adminController.getUserById
+);
+
+// Update User by ID
+router.patch(
+    "/users/:userId",
+    verifyJWT,
+    authorizeRoles("admin"),
+    adminController.updateUser
+);
+
+// Status of user 
+router.patch(
+    "/users/:userId/block",
+    verifyJWT,
+    authorizeRoles("admin"),
+    adminController.toggleUserBlockStatus
+);
+
+// Delete user 
+router.delete(
+    "/users/:userId",
+    verifyJWT,
+    authorizeRoles("admin"),
+    adminController.deleteUser
+);
+
+// Statistics 
+router.get(
+    "/statistics",
+    verifyJWT,
+    authorizeRoles("admin"),
+    adminController.getAdminStatistics
+);
+
 module.exports = router;

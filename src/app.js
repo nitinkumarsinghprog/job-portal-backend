@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const errorHandler = require("./middleware/error.middleware");
 const userRoutes = require("./routes/user.routes");
 const adminRoutes = require("./routes/admin.routes");
 
@@ -22,5 +23,8 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/users", userRoutes);
+
+// Global Error Handler
+app.use(errorHandler);
 
 module.exports = app;

@@ -36,6 +36,11 @@ const userSchema = new Schema(
 
         refreshToken: {
             type: String
+        },
+
+        isBlocked: {
+            type: Boolean,
+            default: false
         }
     },
     {
