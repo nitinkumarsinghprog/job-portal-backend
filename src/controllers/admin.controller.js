@@ -95,7 +95,7 @@ const getAllUsers = AsyncHandler(async (req, res) => {
 
 const getUserById = AsyncHandler(async (req,res) => {
 
-    const { userId } = req.parems;
+    const { userId } = req.params;
 
     const user = await User.findById(userId).select("-password -refreshToken");
 
@@ -106,7 +106,7 @@ const getUserById = AsyncHandler(async (req,res) => {
     const response = new ApiResponse(200, user, "User fetch successfully");
 
     console.log("========== Response of get User By ID ==========");
-    console.lop(JSON.stringify(user, null, 2));
+    console.log(JSON.stringify(user, null, 2));
 
     return res.status(200).json(response);
 });
