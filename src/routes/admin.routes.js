@@ -31,4 +31,12 @@ router.get(
     adminController.getAllUsers
 );
 
+// Get User by ID
+router.get(
+    "/users/:userId",
+    verifyJWT,
+    authorizeRoles("admin"),
+    adminController.getUserById
+);
+
 module.exports = router;
