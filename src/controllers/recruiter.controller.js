@@ -156,10 +156,133 @@ const getJobById = AsyncHandler(async (req, res) => {
         .json(response);
 });
 
+const updateJob = AsyncHandler(async (req, res) => {
+
+    const { jobId } = req.params;
+
+    const {
+        title,
+        description,
+        company,
+        location,
+        salary,
+        jobType,
+        experience,
+        skills,
+        status
+    } = req.body;
+
+    // 1. Find job
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+        throw new ApiError(
+            404,
+            "Job not found"
+        );
+    }
+
+    // 2. Check job ownership
+    if (job.postedBy.toString() !== req.user._id.toString()) {
+        throw new ApiError(
+            403,
+            "You are not allowed to update this job"
+        );
+    }
+
+    // 3. At least one field should be provided
+    if (
+        title === undefined &&
+        description === undefined &&
+        company === undefined &&
+        location === undefined &&
+        salary === undefined &&
+        jobType === undefined &&
+        experience === undefined &&
+        skills === undefined &&
+        status === undefined
+    ) {
+        throw new ApiError(
+            400,
+            "At least one field is required to update"
+        );
+    }
+
+    // 4. Validate skills
+    if (
+        skills !== undefined &&
+        (!Array.isArray(skills) || skills.length === 0)
+    ) {
+        throw new ApiError(
+            400,
+            "Skills must contain at least one skill"
+        );
+    }
+
+    // 5. Update only provided fields
+    if (title !== undefined) {
+        job.title = title.trim();
+    }
+
+    if (description !== undefined) {
+        job.description = description.trim();
+    }
+
+    if (company !== undefined) {
+        job.company = company.trim();
+    }
+
+    if (location !== undefined) {
+        job.location = location.trim();
+    }
+
+    if (salary !== undefined) {
+        job.salary = salary;
+    }
+
+    if (jobType !== undefined) {
+        job.jobType = jobType.trim().toLowerCase();
+    }
+
+    if (experience !== undefined) {
+        job.experience = experience.trim();
+    }
+
+    if (skills !== undefined) {
+        job.skills = skills;
+    }
+
+    if (status !== undefined) {
+        job.status = status.trim().toLowerCase();
+    }
+
+    // 6. Save updated job
+    await job.save();
+
+    // 7. Populate recruiter details
+    const updatedJob = await Job
+        .findById(job._id)
+        .populate("postedBy", "name email role");
+
+    const response = new ApiResponse(
+        200,
+        updatedJob,
+        "Job updated successfully"
+    );
+
+    console.log("========== Update Job Response ==========");
+    console.log(JSON.stringify(response, null, 2));
+
+    return res
+        .status(200)
+        .json(response);
+});
+
 
 module.exports = {
     createJob,
     getAllJobs,
     getMyJobs,
     getJobById,
+    updateJob,
 };

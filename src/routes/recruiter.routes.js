@@ -34,5 +34,12 @@ router.get(
     recruiterController.getJobById
 );
 
+router.patch(
+    "/jobs/:jobId",
+    verifyJWT,
+    authorizeRoles("recruiter"),
+    recruiterController.updateJob
+);
+
 module.exports = router;
 
