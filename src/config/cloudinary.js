@@ -20,11 +20,4 @@ if (
 
 cloudinary.config(cloudinaryConfig);
 
-console.log("Cloudinary configured:", {
-  cloudName: cloudinaryConfig.cloud_name,
-  apiKeySuffix: `...${cloudinaryConfig.api_key.slice(-4)}`,
-  endpoint:
-    cloudinaryConfig.upload_prefix || "https://api.cloudinary.com (default US)",
-});
-
 module.exports = cloudinary;

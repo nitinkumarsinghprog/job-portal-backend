@@ -57,23 +57,14 @@ const applyForJob = AsyncHandler(async (req, res) => {
   // 6. Create application
   const application = await Application.create({
     candidate: req.user._id,
-
     job: jobId,
-
     resume: uploadedResume.secure_url,
-
     workExperience: Number(workExperience),
-
     currentLocation,
-
     noticePeriod: Number(noticePeriod),
-
     currentSalary: Number(currentSalary),
-
     expectedSalary: Number(expectedSalary),
-
     currentDesignation,
-
     coverLetter,
   });
 
@@ -94,6 +85,29 @@ const applyForJob = AsyncHandler(async (req, res) => {
   return res.status(201).json(response);
 });
 
+const getMyApplications = AsyncHandler(async (req, res) => {
+  const applications = await Application.find({
+    candidate: req.user._id,
+  })
+    .populate("job", "title company location salary jobType status")
+    .populate("candidate", "name email role")
+    .sort({
+      createdAt: -1,
+    });
+
+  const response = new ApiResponse(
+    200,
+    applications,
+    "Applications fetched successfully",
+  );
+
+  console.log("========== My Applications ==========");
+  console.log(JSON.stringify(response, null, 2));
+
+  return res.status(200).json(response);
+});
+
 module.exports = {
   applyForJob,
+  getMyApplications,
 };
