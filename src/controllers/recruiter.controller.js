@@ -104,8 +104,32 @@ const getAllJobs = AsyncHandler(async (req, res) => {
         .json(response);
 });
 
+const getMyJobs = AsyncHandler(async (req, res) => {
+
+    const jobs = await Job
+        .find({
+            postedBy: req.user._id
+        })
+        .populate("postedBy", "name email role")
+        .sort({ createdAt: -1 });
+
+    const response = new ApiResponse(
+        200,
+        jobs,
+        "Your jobs fetched successfully"
+    );
+
+    console.log("========== Get My Jobs ==========");
+    console.log(JSON.stringify(response, null, 2));
+
+    return res
+        .status(200)
+        .json(response);
+});
+
 
 module.exports = {
     createJob,
     getAllJobs,
+    getMyJobs,
 };
