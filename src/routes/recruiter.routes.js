@@ -14,5 +14,11 @@ router.post(
     recruiterController.createJob,
 );
 
+router.get(
+    "/jobs",
+    verifyJWT,
+    recruiterController.getAllJobs
+);
+
 module.exports = router;
 

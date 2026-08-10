@@ -16,7 +16,7 @@ const createJob = AsyncHandler(async (req, res) => {
         experience,
         skills
     } = req.body;
-    
+
     // 1. Validate required fields
     if (
         !title ||
@@ -83,7 +83,29 @@ const createJob = AsyncHandler(async (req, res) => {
     return res.status(201).json(response);
 });
 
+const getAllJobs = AsyncHandler(async (req, res) => {
+
+    const jobs = await Job
+        .find({ status: "open" })
+        .populate("postedBy", "name email role")
+        .sort({ createdAt: -1 });
+
+    const response = new ApiResponse(
+        200,
+        jobs,
+        "Jobs fetched successfully"
+    );
+
+    console.log("========== Get All Jobs ==========");
+    console.log(JSON.stringify(response, null, 2));
+
+    return res
+        .status(200)
+        .json(response);
+});
+
 
 module.exports = {
-    createJob
+    createJob,
+    getAllJobs,
 };
