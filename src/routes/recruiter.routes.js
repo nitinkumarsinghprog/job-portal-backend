@@ -41,5 +41,12 @@ router.patch(
     recruiterController.updateJob
 );
 
+router.patch(
+    "/jobs/:jobId/close",
+    verifyJWT,
+    authorizeRoles("recruiter"),
+    recruiterController.closeJob
+);
+
 module.exports = router;
 

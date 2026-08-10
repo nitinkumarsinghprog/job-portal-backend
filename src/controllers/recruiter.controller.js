@@ -278,6 +278,63 @@ const updateJob = AsyncHandler(async (req, res) => {
         .json(response);
 });
 
+const closeJob = AsyncHandler(async (req, res) => {
+
+    const { jobId } = req.params;
+
+    // 1. Find job
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+        throw new ApiError(
+            404,
+            "Job not found"
+        );
+    }
+
+    // 2. Check ownership
+    if (
+        job.postedBy.toString() !==
+        req.user._id.toString()
+    ) {
+        throw new ApiError(
+            403,
+            "You are not allowed to close this job"
+        );
+    }
+
+    // 3. Check already closed
+    if (job.status === "closed") {
+        throw new ApiError(
+            400,
+            "Job is already closed"
+        );
+    }
+
+    // 4. Close job
+    job.status = "closed";
+
+    await job.save();
+
+    // 5. Get updated job with recruiter details
+    const updatedJob = await Job
+        .findById(job._id)
+        .populate("postedBy", "name email role");
+
+    const response = new ApiResponse(
+        200,
+        updatedJob,
+        "Job closed successfully"
+    );
+
+    console.log("========== Close Job Response ==========");
+    console.log(JSON.stringify(response, null, 2));
+
+    return res
+        .status(200)
+        .json(response);
+});
+
 
 module.exports = {
     createJob,
@@ -285,4 +342,5 @@ module.exports = {
     getMyJobs,
     getJobById,
     updateJob,
+    closeJob,
 };
