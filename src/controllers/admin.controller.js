@@ -69,7 +69,7 @@ const createRecruiter = AsyncHandler(async (req, res) => {
         );
 
     console.log("========== Response of create Recruiter ==========");
-    console.log(JSON.stringify(user, null, 2));
+    console.log(JSON.stringify(response, null, 2));
 
     // 5. Response
     return res.status(201).json(response);
