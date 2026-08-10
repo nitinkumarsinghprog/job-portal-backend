@@ -6,13 +6,16 @@ const userRoutes = require("./routes/user.routes");
 const adminRoutes = require("./routes/admin.routes");
 const recruiterRoutes = require("./routes/recruiter.routes");
 const candidateRoutes = require("./routes/candidate.routes");
+const jobsRoutes = require("./routes/jobs.routes");
 
 const app = express();
 
-app.use(cors({
+app.use(
+  cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true,
-}));
+  }),
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -27,6 +30,7 @@ app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/recruiter", recruiterRoutes);
 app.use("/api/v1/candidate", candidateRoutes);
+app.use("/api/v1/jobs", jobsRoutes);
 
 // Global Error Handler
 app.use(errorHandler);

@@ -8,6 +8,8 @@ const candidateController = require("../controllers/candidate.controller");
 
 const router = Router();
 
+// ================= Candidate Protected Routes =================
+
 // Apply for the Job
 router.post(
   "/jobs/:jobId/apply",
