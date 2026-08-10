@@ -27,5 +27,12 @@ router.get(
     recruiterController.getMyJobs
 );
 
+router.get(
+    "/jobs/:jobId",
+    verifyJWT,
+    authorizeRoles("recruiter"),
+    recruiterController.getJobById
+);
+
 module.exports = router;
 

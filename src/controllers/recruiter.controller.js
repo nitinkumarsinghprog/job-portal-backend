@@ -127,9 +127,39 @@ const getMyJobs = AsyncHandler(async (req, res) => {
         .json(response);
 });
 
+const getJobById = AsyncHandler(async (req, res) => {
+
+    const { jobId } = req.params;
+
+    const job = await Job
+        .findById(jobId)
+        .populate("postedBy", "name email role");
+
+    if (!job) {
+        throw new ApiError(
+            404,
+            "Job not found"
+        );
+    }
+
+    const response = new ApiResponse(
+        200,
+        job,
+        "Job fetched successfully"
+    );
+
+    console.log("========== Get Job By ID ==========");
+    console.log(JSON.stringify(response, null, 2));
+
+    return res
+        .status(200)
+        .json(response);
+});
+
 
 module.exports = {
     createJob,
     getAllJobs,
     getMyJobs,
+    getJobById,
 };
